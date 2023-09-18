@@ -92,7 +92,6 @@ def cleaning_matrix(tabel_input=None):
     return cleaning_result
 
 # Updating IO
-# Cara Manual
 # Classical IPF Algorithm
 def ipf_update(M, u, v):
     
@@ -250,8 +249,6 @@ def creating_panel_df(list_tahun_input, kode_kk_cd):
 
 def target_col_row(matrix_update=None, panel_df=None, industry_name_input=None,
                    adjusment_vector=True):
-    
-    # Masih dalam konstruksi!!!
     
     # Fungsi ini hanya berlaku untuk Tabel Input-Output 17 Lapangan Usaha.
     # matrix_update: mat, matrix yang akan diupdate.
