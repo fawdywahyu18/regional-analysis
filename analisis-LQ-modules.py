@@ -1,10 +1,3 @@
-"""
-Script untuk analisis Location Quotient (LQ)
-level kabupaten/kota dan provinsi
-
-@author: fawdywahyu
-"""
-
 import pandas as pd
 
 def cleaning_data(tahun, kode_kk):
@@ -121,3 +114,30 @@ def rata_rata_LQ(tahun_list, pdrb_df_input, list_lu_input):
     lq_merge[f'Rata-rata Koefisien LQ {tahun_awal}-{tahun_akhir}'] = lq_merge[colnames_lq[2:]].mean(axis=1)
     
     return lq_merge
+
+def ranking_kabkot(avg_lq_kabkot=None, list_lu=None):
+    
+    # avg_lq_kabkot = avg_lq_papbar
+    # list_lu = lu_all[1:]
+    
+    df_colnames = avg_lq_kabkot.columns
+    
+    for l in list_lu:
+        df_subset_col = avg_lq_kabkot.iloc[:,[0,1,-1]]
+        df_subset = df_subset_col[df_subset_col['Lapangan Usaha']==l]
+        df_sort = df_subset.sort_values(by=[df_colnames[-1]], ascending=False)
+        top_n = df_sort.iloc[:3, :] 
+        
+        if l==list_lu[0]:
+            df_append = top_n
+        else:
+            df_append = pd.concat([df_append, top_n], axis=0)
+    
+    series_frek = df_append['Nama Kab/Kota'].value_counts()
+    df_frek = series_frek.to_frame()
+    df_frek.reset_index(inplace=True)
+    df_frek.columns = ['Nama Kabupaten/Kota yang masuk dalam daftar tiga teratas', 'Frekuensi']
+    
+    dict_rank = {'Data Append':df_append,
+                 'Tabel Frekuensi': df_frek}
+    return dict_rank
