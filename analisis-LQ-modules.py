@@ -118,17 +118,18 @@ def rata_rata_LQ(tahun_list, pdrb_df_input, list_lu_input):
 def ranking_kabkot(avg_lq_kabkot=None, list_lu=None):
     
     # avg_lq_kabkot = avg_lq_papbar
-    # list_lu = lu_all[1:]
+    # list_lu = lu_all
     
     df_colnames = avg_lq_kabkot.columns
+    list_lu_subset = list_lu[1:]
     
-    for l in list_lu:
+    for l in list_lu_subset:
         df_subset_col = avg_lq_kabkot.iloc[:,[0,1,-1]]
         df_subset = df_subset_col[df_subset_col['Lapangan Usaha']==l]
         df_sort = df_subset.sort_values(by=[df_colnames[-1]], ascending=False)
         top_n = df_sort.iloc[:3, :] 
         
-        if l==list_lu[0]:
+        if l==list_lu_subset[0]:
             df_append = top_n
         else:
             df_append = pd.concat([df_append, top_n], axis=0)
