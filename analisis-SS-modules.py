@@ -119,6 +119,34 @@ def analisis_SS(pdrb_ss, list_lu, index_kolom_estimasi=4):
         i_end = i_initial + 1
     
     colnames_merge = list(df_merge_final.columns)
-    df_merge_final['Rata-rata'] = df_merge_final[colnames_merge[2:]].mean(axis=1)
+    df_merge_final['Median'] = df_merge_final[colnames_merge[2:]].median(axis=1)
     
     return df_merge_final
+
+def ranking_kabkot(shift_share_kabkot=None, list_lu=None):
+    
+    # shift_share_kabkot = shift_share_sulsel
+    # list_lu = lu_sulsel
+    
+    df_colnames = shift_share_kabkot.columns
+    list_lu_subset = list_lu[1:]
+    
+    for l in list_lu_subset:
+        df_subset_col = shift_share_kabkot.iloc[:,[0,1,-1]]
+        df_subset = df_subset_col[df_subset_col['Lapangan Usaha']==l]
+        df_sort = df_subset.sort_values(by=[df_colnames[-1]], ascending=False)
+        top_n = df_sort.iloc[:3, :] 
+        
+        if l==list_lu_subset[0]:
+            df_append = top_n
+        else:
+            df_append = pd.concat([df_append, top_n], axis=0)
+    
+    series_frek = df_append['Nama Kab/Kota'].value_counts()
+    df_frek = series_frek.to_frame()
+    df_frek.reset_index(inplace=True)
+    df_frek.columns = ['Nama Kabupaten/Kota yang masuk dalam daftar tiga teratas', 'Frekuensi']
+    
+    dict_rank = {'Data Append':df_append,
+                 'Tabel Frekuensi': df_frek}
+    return dict_rank
