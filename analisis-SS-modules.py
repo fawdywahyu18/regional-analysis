@@ -66,6 +66,7 @@ def analisis_SS(pdrb_ss, list_lu, index_kolom_estimasi=4):
     
     # pdrb_ss = pdrb_ss_sulsel
     # list_lu = lu_sulsel
+    # index_kolom_estimasi = 4
     
     nama_kabkot = pdrb_ss['Nama Kab/Kota'].unique()
     
@@ -93,14 +94,18 @@ def analisis_SS(pdrb_ss, list_lu, index_kolom_estimasi=4):
         
         # selisih_y adalah Ri
         # selisih_x adalah ri
+        colnames_merge = df_merge.columns
+        
         df_merge['ri - Ri'] = df_merge['selisih_x'] - df_merge['selisih_y']
-        df_merge['PNij'] = df_merge.iloc[:,2] * df_merge['Ra']
-        df_merge['Ppij'] = df_merge.iloc[:,2] * df_merge['Ri - Ra'] # Ppij : Komponen pertumbuhan proporsional sektor i wilayah j
-        df_merge['PPWij'] = df_merge.iloc[:,2] * df_merge['ri - Ri'] # PPWij : Komponen Pertumbuhan Pangsa Wilayah sektor i wilayah j
+        df_merge['PNij'] = df_merge[colnames_merge[2]] * df_merge['Ra']
+        df_merge['Ppij'] = df_merge[colnames_merge[2]] * df_merge['Ri - Ra'] # Ppij : Komponen pertumbuhan proporsional (PP) sektor i wilayah j
+        df_merge['PPWij'] = df_merge.iloc[:,2] * df_merge['ri - Ri'] # PPWij : Komponen Pertumbuhan Pangsa Wilayah (PPW) sektor i wilayah j
         df_merge['PBij'] = df_merge['Ppij'] + df_merge['PPWij'] # PBij : Pergeseran Bersih sektor i pada wilayah j
+        df_merge['PP %'] = df_merge['Ppij'] / df_merge[colnames_merge[2]]
+        df_merge['PPW %'] = df_merge['PPWij'] / df_merge[colnames_merge[2]]
         
         # select columns
-        kolom_estimasi = ['ri - Ri', 'PNij', 'Ppij', 'PPWij', 'PBij']
+        kolom_estimasi = ['ri - Ri', 'PNij', 'Ppij', 'PPWij', 'PBij', 'PP %', 'PPW %']
         kolom_keluar = index_kolom_estimasi
         
         df_merge_selected = df_merge[['Nama Kab/Kota_x', 'Lapangan Usaha', kolom_estimasi[kolom_keluar]]]
