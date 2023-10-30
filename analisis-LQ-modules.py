@@ -1,3 +1,10 @@
+"""
+Script untuk analisis Location Quotient (LQ)
+level kabupaten/kota dan provinsi
+
+@author: fawdywahyu
+"""
+
 import pandas as pd
 
 def cleaning_data(tahun, kode_kk):
@@ -118,7 +125,7 @@ def rata_rata_LQ(tahun_list, pdrb_df_input, list_lu_input):
 def ranking_kabkot(avg_lq_kabkot=None, list_lu=None):
     
     # avg_lq_kabkot = avg_lq_papbar
-    # list_lu = lu_all
+    # list_lu = lu_all[1:]
     
     df_colnames = avg_lq_kabkot.columns
     list_lu_subset = list_lu[1:]
