@@ -94,11 +94,12 @@ def io_analysis(clean_matrix=None, list_industry=None,
                 delta_va_input=None,
                 first_round_id=None):
     
-    # clean_matrix = matrix_clean_sulsel
-    # list_industry = industry_name
-    # input_industry_name = list_industry[0]
+    # clean_matrix = matrix_clean_papbar
+    # list_industry = industry_name_papbar
+    # input_industry_name = sektor_unggulan_lq_papbar[2]
     # delta_fd_input = 1
     # delta_va_input = 1
+    # first_round_id='Demand'
     # first_round_id='Demand' or 'Supply'
     
     # Multiplier and Linkage Analysis
@@ -135,7 +136,8 @@ def io_analysis(clean_matrix=None, list_industry=None,
     
     # Indirect Backward Linkage
     colsum_L = np.sum(clean_matrix['Matrix L'], axis=0)
-    indirect_bl_j = colsum_L[indeks_bb]
+    total_bl_j = colsum_L[indeks_bb]
+    indirect_bl_j = total_bl_j - direct_bl_j
     
     
     # Direct Forward Linkage
@@ -152,9 +154,10 @@ def io_analysis(clean_matrix=None, list_industry=None,
     # Direct Forward Linkage
     direct_fl_j = rowsum_B[indeks_bb]
     
-    # Indirect Backward Linkage
+    # Indirect Forward Linkage
     rowsum_G = np.sum(clean_matrix['Matrix G'], axis=1)
-    indirect_fl_j = rowsum_G[indeks_bb]
+    total_fl_j = rowsum_G[indeks_bb]
+    indirect_fl_j = total_fl_j - direct_fl_j
     
     
     # Indeks Daya Penyebaran dan Indeks Derajat Kepekaan
@@ -187,11 +190,13 @@ def io_analysis(clean_matrix=None, list_industry=None,
         'Multiplier Output Demand': np.round(multiplier_demand,4),
         'Multiplier Output Supply': np.round(multiplier_supply,4),
         'Normalized Direct Backward Linkage': np.round(bl_j, 4),
-        'Direct Backward Linkage': np.round(direct_bl_j, 4),
         'Indirect Backward Linkage': np.round(indirect_bl_j, 4),
+        'Direct Backward Linkage': np.round(direct_bl_j, 4),
+        'Total Backward Linkage' : np.round(total_bl_j, 4),
         'Normalized Direct Forward Linkage': np.round(fl_j, 4),
-        'Direct Forward Linkage': np.round(direct_fl_j, 4),
         'Indirect Forward Linkage': np.round(indirect_fl_j, 4),
+        'Direct Forward Linkage': np.round(direct_fl_j, 4),
+        'Total Forward Linkage' : np.round(total_fl_j, 4),
         'Indeks Daya Penyebaran': np.round(idp_j, 4),
         'Indeks Derajat Kepekaan': np.round(idk_j, 4),
         'First Round Effect': np.round(first_round_effect, 4),
@@ -199,4 +204,52 @@ def io_analysis(clean_matrix=None, list_industry=None,
         'Production Induced Effect': np.round(production_induced_effect, 4)
         }
     
-    return analysis_result
+    df_analisis_io = pd.DataFrame(analysis_result, index=[0]).reset_index()
+    df_melt = pd.melt(df_analisis_io, id_vars=['index'], value_vars=df_analisis_io.columns)
+    list_rename = ['Nama Industri', 'Jenis Analisis', 'Nilai']
+    df_melt.columns = list_rename
+    df_melt['Nama Industri'] = input_industry_name
+
+    return df_melt
+
+def struktur_io(mat_Z=None, list_industri = None, lab_input='input', 
+                nama_industri=None, top_berapa=10):
+    # mat_Z = matrix, hasil dari cleaning process
+    # list_industri = list, hasil dari function initial identification
+    # lab_input= str, default='input'
+    # nama_industri = str, default= 'Besi dan Baja Dasar'
+    # top_berapa = int, default=20
+    
+    # mat_Z = matrix_clean_sulsel['Matrix Z']
+    # list_industri = industry_name
+    # lab_input='input'
+    # nama_industri='Jasa Kesehatan dan Kegiatan Sosial'
+    
+    indeks_bb = list_industri.index(nama_industri)
+    
+    if lab_input=='input':
+        input_komoditas = pd.DataFrame(mat_Z[:,indeks_bb])
+        total_value_input = input_komoditas.sum()[0]
+        persentase_input = [i*100/total_value_input for i in mat_Z[:,indeks_bb]]
+        df_input_komoditas = pd.concat([input_komoditas, pd.Series(list_industri), 
+                                        pd.Series(persentase_input)], axis=1)
+        df_input_komoditas.columns = ['Nilai Input', 'Nama Produk', 'Persentase Input']
+        df_input_komoditas_sort = df_input_komoditas.sort_values(by=['Nilai Input'],
+                                                                 ascending=False)
+        top_n_input = df_input_komoditas_sort.iloc[:top_berapa,:]
+        
+        return top_n_input
+    elif lab_input=='output':
+        output_komoditas = pd.DataFrame(mat_Z[indeks_bb,:])
+        total_value_output = output_komoditas.sum()[0]
+        persentase_output = [o*100/total_value_output for o in mat_Z[indeks_bb,:]]
+        df_output_komoditas = pd.concat([output_komoditas, pd.Series(list_industri),
+                                         pd.Series(persentase_output)], axis=1)
+        df_output_komoditas.columns = ['Nilai Output', 'Nama Produk', 'Persentase Output']
+        df_output_komoditas_sort = df_output_komoditas.sort_values(by=['Nilai Output'],
+                                                                   ascending=False)
+        top_n_output = df_output_komoditas_sort.iloc[:top_berapa,:]
+
+        return top_n_output
+    else:
+        raise ValueError('unrecognize label for argument "input"')
