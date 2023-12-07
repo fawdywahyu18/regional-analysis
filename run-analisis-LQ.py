@@ -1,7 +1,5 @@
 # script untuk running modul analisis-LQ-modules.py
-import sys
-sys.path.append('/Modules')
-from analisis_LQ_modules import *
+from Modules.analisis_LQ_modules import *
 
 # Running the function
 kode_kepri = ['2100', '2101', '2102', '2103', '2104', '2105', '2171', '2172']
