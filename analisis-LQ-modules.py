@@ -149,3 +149,23 @@ def ranking_kabkot(avg_lq_kabkot=None, list_lu=None):
     dict_rank = {'Data Append':df_append,
                  'Tabel Frekuensi': df_frek}
     return dict_rank
+
+def symmetric_LQ(df_composite=None):
+    # df_composite = avg_lq_provinsi
+    
+    df_concat = df_composite[['Nama Kab/Kota', 'Lapangan Usaha']]
+    
+    for c in range(2, len(df_composite.columns)):
+        lq_t = df_composite.iloc[:,c]
+        symmetric_lq = (lq_t - 1)/(lq_t + 1)
+        df_concat = pd.concat([df_concat, symmetric_lq], axis=1, ignore_index=True)
+        
+    kolom_lama = df_composite.columns
+    kolom_baru = []
+    for k in kolom_lama:
+        string_baru = k.replace('LQ Koefisien', 'Koefisien LQ Simetris')
+        kolom_baru.append(string_baru)
+        
+    df_concat.columns = kolom_baru
+    
+    return df_concat
