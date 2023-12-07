@@ -16,8 +16,8 @@ Panduan Analisis Regional kerjasama dengan Bappenas. Berisi modul LQ, SS, IO, da
 4. pastikan virtual environment dalam kondisi aktif, kemudian ketik `pip install -e .` di terminal. Tunggu instalasi sampai selesai dan sukses.
 
 ## Panduan contoh hasil
-1. Contoh cara melakukan running script ada di folder 'Example'
-2. Contoh hasil output package ada di folder 'Example Output'
+1. Contoh cara melakukan running script ada di folder 'Examples'
+2. Contoh hasil output package ada di folder 'Data Export'
 
 ## Apabila Anda ingin running menggunakan contoh data yang sama dengan riset
 1. Pindah direktori ke folder example dengan cara `cd C:\Fawdy\regional-analysis`
