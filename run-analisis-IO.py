@@ -1,7 +1,5 @@
 # script to run analisis-IO-modules.py untuk 3 contoh provinsi: Sulawesi Selatan, Papua Barat, dan Kepulauan Riau
-import sys
-sys.path.append('/Modules')
-from analisis_IO_modules import *
+from Modules.analisis_IO_modules import *
 
 # Sulawesi Selatan
 # Load data
