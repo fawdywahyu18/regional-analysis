@@ -1,7 +1,5 @@
 # script untuk run updating-IO-modules.py
-import sys
-sys.path.append('/Modules')
-from updating_IO_modules import *
+from Modules.updating_IO_modules import *
 
 kode_sulsel = ['7300']
 kode_kepri = ['2100']
