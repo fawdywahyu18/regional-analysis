@@ -1,0 +1,8 @@
+ipfn==1.4.4
+numpy==1.26.2
+pandas==1.5.2
+python-dateutil==2.8.2
+pytz==2023.3.post1
+setuptools==68.0.0
+six==1.16.0
+wheel==0.41.2
