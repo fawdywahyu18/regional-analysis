@@ -16,8 +16,12 @@ setup(
         'six==1.16.0',
         'wheel==0.41.2'
     ],
-    entry_points='''
-        [console_scripts]
-        regional-analysis=regional-analysis:regional-analysis
-    ''',
+    entry_points={
+        'console_scripts': [
+            'analisis-IO-modules = regional-analysis:analisis-IO-modules',
+            'analisis-LQ-modules = regional-analysis:analisis-LQ-modules',
+            'analisis-SS-modules = regional-analysis:analisis-SS-modules',
+            'updating-IO-modules = regional-analysis:updating-IO-modules'
+        ],
+    },
 )
