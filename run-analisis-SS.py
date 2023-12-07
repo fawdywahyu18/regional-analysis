@@ -1,7 +1,5 @@
 # script untuk run analisis-SS-modules.py
-import sys
-sys.path.append('/Modules')
-from analisis_SS_modules import *
+from Modules.analisis_SS_modules import *
 
 
 # Perlu diperhatikan bahwa kode provinsi selalu paling awal, setelah itu, urutannya gak penting
