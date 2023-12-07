@@ -258,11 +258,13 @@ def target_col_row(matrix_update=None, panel_df=None, industry_name_input=None,
     # panel_df: dataframe, dataframe berbentuk panel hasil dari function creating_panel_df.
     # industry_name_input: list, list yang berisi nama industri/lapangan usaha hasil dari function initial_identification.
     
-    # matrix_update = mat_update
-    # panel_df = pdrb_sulsel
-    # industry_name_input = industry_name
-    # adjusment_vector=True
     
+    # matrix_update = matZ_before_update
+    # panel_df = pdrb_papbar
+    # industry_name_input = industry_name
+    # adjusment_vector=False
+    
+    panel_df = panel_df.drop('pertumbuhan', axis=1)
     # Mengganti nama lapangan usaha di panel_df agar sesuai dengan industry_name_input
     panel_edited = panel_df.drop(panel_df.index[0])
     pattern_removed = ['PDRB ADHK Tahun Dasar 2010 Berdasarkan Lapangan Usaha - ', 'PDRB ADHK Tahun Dasar 2010 Berdasarkan Lapangan Usaha -', ',', ';']
@@ -436,8 +438,8 @@ def updating_old_matrix(matZ_hasil_update_input=None, matrix_clean_old=None):
     # matZ_hasil_update_input = matZ_hasil_update
     # matrix_clean_old = matrix_clean
     
-    matZ_hasil_update_input = matZ_hasil_update
-    matrix_clean_old = matrix_clean
+    # matZ_hasil_update_input = matZ_hasil_update
+    # matrix_clean_old = matrix_clean
     
     # Demand Side
     mat_Z = matZ_hasil_update_input
@@ -475,93 +477,82 @@ def updating_old_matrix(matZ_hasil_update_input=None, matrix_clean_old=None):
     
     return updating_result
 
+def run_update_provinsi(file_name_prov=None, kode_prov=None, tahun_list=None,
+                        list_lu_lq=None, list_lu_ss=None):
+    
+    # file_name_prov: str, 'Data/Tabel Input-Output Provinsi Sulawesi Selatan Transaksi Domestik Atas Dasar Harga Produsen (17 Lapangan Usaha) 2016 (Juta Rupiah).xlsx'
+    # kode_prov: list
+    # tahun_list: list
+    # list_lu_lq: list
+    # list_lu_ss: list
+    
+    # file_name_prov = file_name_17_sulsel
+    # kode_prov = kode_sulsel
+    # tahun_list = list_tahun
+    # list_lu_lq = sektor_unggulan_lq_sulsel
+    # list_lu_ss = sektor_unggulan_ss_sulsel
+    
+    df_io = pd.read_excel(file_name_prov)
+    matrix_id = initial_identification(df_io)
+    matrix_clean = cleaning_matrix(df_io)
+    industry_name = matrix_id['Industry Name']
+    
+    # Mendefinisikan row dan col target
+    matA_before_update = matrix_clean['Matrix A']
+    matZ_before_update = matrix_clean['Matrix Z']
 
+    pdrb_prov = creating_panel_df(list_tahun_input=tahun_list, kode_kk_cd=kode_prov)
+    pdrb_prov_col = pdrb_prov.columns
+    pdrb_prov['pertumbuhan'] = (pdrb_prov[pdrb_prov_col[-1]] - pdrb_prov[pdrb_prov_col[-2]])/pdrb_prov[pdrb_prov_col[-2]]
+    
+    u_targetA = target_col_row(matA_before_update, pdrb_prov, industry_name, adjusment_vector=False)['u_target']
+    v_targetA = target_col_row(matA_before_update, pdrb_prov, industry_name, adjusment_vector=False)['v_target']
 
-# Running function
-# Hati2 matrix before update keubah sendiri mengikuti hasil update, perlu load ulang
+    u_targetZ = target_col_row(matZ_before_update, pdrb_prov, industry_name, adjusment_vector=False)['u_target']
+    v_targetZ = target_col_row(matZ_before_update, pdrb_prov, industry_name, adjusment_vector=False)['v_target']
 
-# Sulawesi Selatan
-# Load data
-file_name_52_sulsel = 'Data/Tabel Input-Output Provinsi Sulawesi Selatan Transaksi Domestik Atas Dasar Harga Produsen (52 Industri) 2016 (Juta Rupiah).xlsx'
-file_name_17_sulsel = 'Data/Tabel Input-Output Provinsi Sulawesi Selatan Transaksi Domestik Atas Dasar Harga Produsen (17 Lapangan Usaha) 2016 (Juta Rupiah).xlsx'
+    hasil_updateA = updating_IO(matA_before_update, u_targetA, v_targetA, 10000)
+    hasil_updateZ = updating_IO(matZ_before_update, u_targetZ, v_targetZ, 10000)
+    
+    indeks_min = hasil_updateA['Index Minimum']
+    # Hasil indeks_min = 0 artinya metode classic ipf adalah yg terbaik
+    # hasil indeks_min = 1 artinya metode factor ipf adalah yg terbaik
+    # hasil indeks_min = 2 artinya metode ipfn dari github adalah yg terbaik
 
-df_io = pd.read_excel(file_name_17_sulsel)
-matrix_id = initial_identification(df_io)
-matrix_clean = cleaning_matrix(df_io)
-industry_name = matrix_id['Industry Name']
+    matA_hasil_update = hasil_updateA['Matrix Result']
+    matZ_hasil_update = hasil_updateZ['Matrix Result']
 
-
-# Mendefinisikan row dan col target
-matA_before_update = matrix_clean['Matrix A']
-matZ_before_update = matrix_clean['Matrix Z']
-
-
-kode_sulsel = ['7300']
-kode_kepri = ['2100']
-kode_papbar = ['9100']
-list_tahun = ['2016', '2020'] # tahun awal harus 2016, sedangkan tahun akhir harus setelag 2016
-
-pdrb_sulsel = creating_panel_df(list_tahun_input=list_tahun, kode_kk_cd=kode_sulsel)
-pdrb_sulsel_col = pdrb_sulsel.columns
-pdrb_sulsel['pertumbuhan'] = (pdrb_sulsel[pdrb_sulsel_col[-1]] - pdrb_sulsel[pdrb_sulsel_col[-2]])/pdrb_sulsel[pdrb_sulsel_col[-2]]
-pdrb_sulsel.to_excel(f'Data Export/Sulawesi Selatan/Pertumbuhan per Lapangan Usaha Sulsel {list_tahun[0]} ke {list_tahun[1]}.xlsx')
-
-
-u_targetA = target_col_row(matA_before_update, pdrb_sulsel, industry_name, adjusment_vector=False)['u_target']
-v_targetA = target_col_row(matA_before_update, pdrb_sulsel, industry_name, adjusment_vector=False)['v_target']
-
-u_targetZ = target_col_row(matZ_before_update, pdrb_sulsel, industry_name, adjusment_vector=False)['u_target']
-v_targetZ = target_col_row(matZ_before_update, pdrb_sulsel, industry_name, adjusment_vector=False)['v_target']
-
-
-hasil_updateA = updating_IO(matA_before_update, u_targetA, v_targetA, 10000)
-hasil_updateZ = updating_IO(matZ_before_update, u_targetZ, v_targetZ, 10000)
-
-
-indeks_min = hasil_updateA['Index Minimum']
-# Hasil indeks_min = 0 artinya metode classic ipf adalah yg terbaik
-# hasil indeks_min = 1 artinya metode factor ipf adalah yg terbaik
-# hasil indeks_min = 2 artinya metode ipfn dari github adalah yg terbaik
-
-matA_hasil_update = hasil_updateA['Matrix Result']
-matZ_hasil_update = hasil_updateZ['Matrix Result']
-
-matrix_clean_sulsel_updated = updating_old_matrix(matZ_hasil_update,
-                                                  matrix_clean)
-
-
-sektor_unggulan_lq = ['Jasa Kesehatan dan Kegiatan Sosial',
-                      'Jasa Pendidikan',
-                      'Pertanian, Kehutanan, dan Perikanan']
-
-sektor_unggulan_ss = ['Perdagangan Besar dan Eceran; Reparasi Mobil dan Sepeda Motor',
-                      'Konstruksi',
-                      'Informasi dan Komunikasi']
-
-analisis_io_sulsel1 = io_analysis(clean_matrix=matrix_clean_sulsel_updated,
-                                  list_industry=industry_name,
-                                  input_industry_name=sektor_unggulan_ss[0],
-                                  delta_fd_input=1,
-                                  delta_va_input=1,
-                                  first_round_id='Demand')
-
-analisis_io_sulsel2 = io_analysis(clean_matrix=matrix_clean_sulsel_updated,
-                                  list_industry=industry_name,
-                                  input_industry_name=sektor_unggulan_ss[1],
-                                  delta_fd_input=1,
-                                  delta_va_input=1,
-                                  first_round_id='Demand')
-
-analisis_io_sulsel3 = io_analysis(clean_matrix=matrix_clean_sulsel_updated,
-                                  list_industry=industry_name,
-                                  input_industry_name=sektor_unggulan_ss[2],
-                                  delta_fd_input=1,
-                                  delta_va_input=1,
-                                  first_round_id='Demand')
-
-df_concat = pd.concat([analisis_io_sulsel1, analisis_io_sulsel2, analisis_io_sulsel3],
-                      axis=0)
-
-df_concat.to_excel('Data Export/Sulawesi Selatan/Hasil Update Analisis IO sektor unggulan SS Dinamis Sulawesi Selatan.xlsx',
-                   index=False)
-
+    matrix_clean_prov_updated = updating_old_matrix(matZ_hasil_update,
+                                                    matrix_clean)
+    
+    for l in range(len(list_lu_lq)):
+        analisis_io_prov_lq = io_analysis(clean_matrix=matrix_clean_prov_updated,
+                                          list_industry=industry_name,
+                                          input_industry_name=list_lu_lq[l],
+                                          delta_fd_input=1,
+                                          delta_va_input=1,
+                                          first_round_id='Demand')
+        
+        analisis_io_prov_ss = io_analysis(clean_matrix=matrix_clean_prov_updated,
+                                          list_industry=industry_name,
+                                          input_industry_name=list_lu_ss[l],
+                                          delta_fd_input=1,
+                                          delta_va_input=1,
+                                          first_round_id='Demand')
+        if l==0:
+            df_concat_lq = analisis_io_prov_lq
+            df_concat_ss = analisis_io_prov_ss
+        else:
+            df_concat_lq = pd.concat([df_concat_lq, analisis_io_prov_lq], axis=0)
+            df_concat_ss = pd.concat([df_concat_ss, analisis_io_prov_ss], axis=0)
+        
+    dict_run_results = {
+        'PDRB Prov Growth': pdrb_prov,
+        'Algoritma Terbaik': indeks_min,
+        'Matrix A Hasil Update': matA_hasil_update,
+        'Matrix Z Hasil Update': matZ_hasil_update,
+        'Hasil Analisis IO Hasil Update LQ': df_concat_lq,
+        'Hasil Analisis IO Hasil Update SS': df_concat_ss
+        }
+    
+    return dict_run_results
