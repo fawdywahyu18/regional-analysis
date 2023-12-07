@@ -18,10 +18,10 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'analisis-IO-modules = regional-analysis:analisis-IO-modules',
-            'analisis-LQ-modules = regional-analysis:analisis-LQ-modules',
-            'analisis-SS-modules = regional-analysis:analisis-SS-modules',
-            'updating-IO-modules = regional-analysis:updating-IO-modules',
+            'analisis-IO-modules = regional-analysis.analisis-IO-modules:analisis-IO-modules',
+            'analisis-LQ-modules = regional-analysis.analisis-LQ-modules:analisis-LQ-modules',
+            'analisis-SS-modules = regional-analysis.analisis-SS-modules:analisis-SS-modules',
+            'updating-IO-modules = regional-analysis.updating-IO-modules:updating-IO-modules',
         ],
     },
 )
