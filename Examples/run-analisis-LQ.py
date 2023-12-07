@@ -29,6 +29,10 @@ avg_lq_kepri = rata_rata_LQ(daftar_tahun, pdrb_kepri, lu_all)
 avg_lq_papbar = rata_rata_LQ(daftar_tahun, pdrb_papbar, lu_all)
 avg_lq_provinsi = rata_rata_LQ(daftar_tahun, pdrb_provinsi, lu_all)
 
+# Sulawesi Selatan
+top3_sulsel = ranking_kabkot(avg_lq_sulsel, lu_all)['Data Append']
+tabel_frek_sulsel = ranking_kabkot(avg_lq_sulsel, lu_all)['Tabel Frekuensi']
+
 # Papua Barat
 top3_papbar = ranking_kabkot(avg_lq_papbar, lu_all)['Data Append']
 tabel_frek_papbar = ranking_kabkot(avg_lq_papbar, lu_all)['Tabel Frekuensi']
@@ -43,6 +47,8 @@ avg_lq_sulsel.to_excel('Data Export/Sulawesi Selatan/LQ Level Kab Kota Sulawesi 
 avg_lq_papbar.to_excel('Data Export/Papua Barat/LQ Level Kab Kota Papua Barat 2013 2020.xlsx', index=False)
 avg_lq_kepri.to_excel('Data Export/Kepulauan Riau/LQ Level Kab Kota Kepulauan Riau 2013 2020.xlsx', index=False)
 
+top3_sulsel.to_excel('Data Export/Sulawesi Selatan/Top 3 LQ per Lapangan Usaha di Kab Kota Sulawesi Selatan 2013 2020.xlsx', index=False)
+tabel_frek_sulsel.to_excel('Data Export/Sulawesi Selatan/Tabel Frekuensi Top 3 LQ per Lapangan Usaha di Kab Kota Sulawesi Selatan 2013 2020.xlsx', index=False)
 
 top3_papbar.to_excel('Data Export/Papua Barat/Top 3 LQ per Lapangan Usaha di Kab Kota Papua Barat 2013 2020.xlsx', index=False)
 tabel_frek_papbar.to_excel('Data Export/Papua Barat/Tabel Frekuensi Top 3 LQ per Lapangan Usaha di Kab Kota Papua Barat 2013 2020.xlsx', index=False)
